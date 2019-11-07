@@ -1,2 +1,2 @@
-# worst-practice-django
+# The worst django practice ever
 Just for learning Django
