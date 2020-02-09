@@ -33,8 +33,8 @@ RUN wget -q "https://github.com/mozilla/geckodriver/releases/download/v0.26.0/ge
     && tar zxf /tmp/geckodriver.tgz -C /usr/bin/ \
     && rm /tmp/geckodriver.tgz
 
-# chromeDriver 80.0.3987.16 
-RUN wget -q "https://chromedriver.storage.googleapis.com/80.0.3987.16/chromedriver_linux64.zip" -O /tmp/chromedriver.zip \
+# chromeDriver 79.0.3945.36 
+RUN wget -q "https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip" -O /tmp/chromedriver.zip \
     && unzip /tmp/chromedriver.zip -d /usr/bin/ \
     && rm /tmp/chromedriver.zip
 
