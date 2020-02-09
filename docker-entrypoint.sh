@@ -4,4 +4,4 @@ cd /usr/local/worst-practice-django && mkdir -p log
 
 cd /usr/local/worst-practice-django
 
-cd /usr/local/worst-practice-django/src && /usr/local/bin/python manage.py runserver 0.0.0.0:8000 &
+cd /usr/local/worst-practice-django/src && /usr/local/bin/python manage.py runserver 0.0.0.0:5678 &

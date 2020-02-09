@@ -2,7 +2,7 @@
 	"name": "worst-practice-django",
 	"image": "worst-practice-django",
 	//"dockerFile": "../Dockerfile",
-	"appPort": [8000, ],
+	"appPort": [5678, ],
 	"extensions": [
 		"ms-python.python"
 	]
