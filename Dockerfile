@@ -1,60 +1,60 @@
-#-------------------------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
-#-------------------------------------------------------------------------------------------------------------
+FROM python:3.7.6-slim-buster
 
-FROM python:3.7
+USER root
 
-# Avoid warnings by switching to noninteractive
-ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    firefox-esr \
+    chromium \
+    git-core \
+    xvfb \
+    xsel \
+    unzip \
+    python-pytest \
+    libgconf-2-4 \
+    libncurses5 \
+    libxml2-dev \
+    libxslt-dev \
+    libz-dev \
+    xclip \
+    wget
 
-# Or your actual UID, GID on Linux if not the default 1000
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+# Set timezone, or it would raise error when connect to Oracle
+ENV TZ=Asia/Taipei
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Configure apt and install packages
-RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
-    #
-    # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
-    && apt-get -y install git procps lsb-release \
-    #
-    # Install pylint
-    && pip --disable-pip-version-check --no-cache-dir install pylint \
-    #
-    # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
-    && groupadd --gid $USER_GID $USERNAME \
-    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    # [Optional] Add sudo support for non-root user
-    && apt-get install -y sudo \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME \
-    #
-    # Clean up
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+# Install python packages
+ADD ./requirements.txt /usr/local/worst-practice-django/requirements.txt
+RUN pip install --upgrade pip && \
+    cd /usr/local/worst-practice-django/ && \
+    pip install -r requirements.txt
 
-# install firefox
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A6DCF7707EBC211F \
-    && apt-get update \
-    && apt install -y software-properties-common \
-    && apt-add-repository "deb http://ppa.launchpad.net/ubuntu-mozilla-security/ppa/ubuntu bionic main" \
-    && apt-get install -y iceweasel
-# install geckodriver
-RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz \
-    && sh -c 'tar -x geckodriver -zf geckodriver-v0.26.0-linux64.tar.gz -O > /usr/bin/geckodriver' \
-    && chmod +x /usr/bin/geckodriver \
-    && rm geckodriver-v0.26.0-linux64.tar.gz
+# GeckoDriver v0.26.0 
+RUN wget -q "https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz" -O /tmp/geckodriver.tgz \
+    && tar zxf /tmp/geckodriver.tgz -C /usr/bin/ \
+    && rm /tmp/geckodriver.tgz
 
-# Install vnc, xvfb in order to create a 'fake' display and firefox
-# RUN  apt-get install -y x11vnc xvfb
-# RUN  mkdir ~/.vnc
-# Setup a password
-# RUN  x11vnc -storepasswd 1234 ~/.vnc/passwd
-# Autostart firefox (might not be the best way to do it, but it does the trick)
-# RUN  bash -c 'echo "firefox" >> /.bashrc'
+# chromeDriver 80.0.3987.16 
+RUN wget -q "https://chromedriver.storage.googleapis.com/80.0.3987.16/chromedriver_linux64.zip" -O /tmp/chromedriver.zip \
+    && unzip /tmp/chromedriver.zip -d /usr/bin/ \
+    && rm /tmp/chromedriver.zip
 
-# Switch back to dialog for any ad-hoc use of apt-get
-ENV DEBIAN_FRONTEND=
+# xvfb - X server display
+# RUN apt-get install -y xvfb-chromium
+ADD xvfb-chromium /usr/bin/xvfb-chromium
+RUN ln -s /usr/bin/xvfb-chromium /usr/bin/google-chrome \
+    && chmod 777 /usr/bin/xvfb-chromium
+
+# create symlinks to chromedriver and geckodriver (to the PATH)
+RUN ln -s /usr/bin/geckodriver /usr/bin/chromium-browser \
+    && chmod 777 /usr/bin/geckodriver \
+    && chmod 777 /usr/bin/chromium-browser
+
+# RUN mkdir /usr/local/worst-practice-django/
+
+WORKDIR /usr/local/worst-practice-django
+
+CMD ["/bin/bash"]
+
+COPY docker-entrypoint.sh /usr/local/worst-practice-django/
+RUN chmod 755 /usr/local/worst-practice-django/docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/worst-practice-django/docker-entrypoint.sh"]

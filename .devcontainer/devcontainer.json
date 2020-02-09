@@ -1,24 +1,9 @@
 {
-    "dockerFile": "../Dockerfile",
-    
-    "runArgs": [
-      "-u", "vscode",
-      "-e", "START_XVFB=true"
-    ],
-    
-    "settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash",
-		"python.pythonPath": "/usr/local/bin/python",
-		"python.linting.pylintEnabled": true,
-		"python.linting.pylintPath": "/usr/local/bin/pylint",
-		"python.linting.enabled": true
-    },
-
-    "appPort": [8000],
-    
-    "postCreateCommand": "sudo pip install -r requirements.txt",
-    
-    "extensions":[
-        "ms-python.python"
-    ]
+	"name": "worst-practice-django",
+	"image": "worst-practice-django",
+	//"dockerFile": "../Dockerfile",
+	"appPort": [8000, ],
+	"extensions": [
+		"ms-python.python"
+	]
 }
