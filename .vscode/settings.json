@@ -1,6 +1,9 @@
 {
     "files.exclude": {
         "**/__pycache__": true,
+        "LICENSE": true,
+        ".devcontainer/": true,
+        "xvfb-chromium": true,
     },
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": false,

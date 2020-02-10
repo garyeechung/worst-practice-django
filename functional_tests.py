@@ -1,6 +1,16 @@
+import logging
+import os
+
 from selenium import webdriver
 
-browser = webdriver.Firefox()
-browser.get('http://localhost:8000')
+logger = logging.getLogger(__name__)
 
-assert 'Django' in browser.title
+browser = webdriver.Chrome()
+browser.get('http://localhost:5678')
+logger.error('title: ' + browser.title)
+assert 'Django' in browser.title, "'Django' is not in title"
+browser.stop_client()
+browser.quit()
+
+os.system('killall -e /usr/lib/chromium/chromium')
+os.system('killall -e chromedriver')
