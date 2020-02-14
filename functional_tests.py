@@ -1,16 +1,30 @@
-import logging
 import os
+import unittest
 
 from selenium import webdriver
 
-logger = logging.getLogger(__name__)
 
-browser = webdriver.Chrome()
-browser.get('http://localhost:5678')
-logger.error('title: ' + browser.title)
-assert 'Django' in browser.title, "'Django' is not in title"
-browser.stop_client()
-browser.quit()
+class TestHome(unittest.TestCase):
 
-os.system('killall -e /usr/lib/chromium/chromium')
-os.system('killall -e chromedriver')
+    def setUp(self):
+        self.browser = webdriver.Chrome()
+        return super().setUp()
+
+    def tearDown(self):
+        self.browser.stop_client()
+        self.browser.quit()
+        os.system('killall -e /usr/lib/chromium/chromium')
+        os.system('killall -e chromedriver')
+        return super().tearDown()
+
+    def test_overview_of_home_page(self):
+        # Gary goes to the home page of Worst Practice Django.
+        self.browser.get('http://localhost:5678')
+
+        # Gary notice the title is "Worst Practice Django".
+        self.assertEqual('Worst Practice Django', self.browser.title)
+        self.fail("Finish all tests")
+
+
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')
